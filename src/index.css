@@ -15,10 +15,6 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
-* {
-  cursor: none !important;
-}
-
 html {
   background-color: #050505;
   color: #e8e8e8;
