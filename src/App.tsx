@@ -1,12 +1,9 @@
 import { useLenis } from './hooks/useLenis'
-import CustomCursor from './components/CustomCursor'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import Capabilities from './components/Capabilities'
+import Services from './components/Services'
 import CaseStudies from './components/CaseStudies'
-import Process from './components/Process'
-import Testimonials from './components/Testimonials'
-import Contact from './components/Contact'
+import TrustedBy from './components/TrustedBy'
 import Footer from './components/Footer'
 
 function App() {
@@ -14,16 +11,12 @@ function App() {
 
   return (
     <>
-      <CustomCursor />
-      <div className="noise-overlay" />
       <Navbar />
-      <main>
+      <main className="bg-[#0a0a0a]">
         <Hero />
-        <Capabilities />
+        <Services />
         <CaseStudies />
-        <Process />
-        <Testimonials />
-        <Contact />
+        <TrustedBy />
       </main>
       <Footer />
     </>

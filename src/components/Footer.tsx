@@ -1,153 +1,197 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
-import { MagneticButton, MarqueeText } from './animations'
-
-const links = [
-  { label: 'Capabilities', href: '#capabilities' },
-  { label: 'Voyages', href: '#voyages' },
-  { label: 'Process', href: '#process' },
-  { label: 'Contact', href: '#contact' },
-]
-
-const socials = [
-  { label: 'Twitter', href: '#', icon: 'X' },
-  { label: 'LinkedIn', href: '#', icon: 'in' },
-  { label: 'Dribbble', href: '#', icon: 'Dr' },
-]
+import { useRef, useState, useEffect } from 'react'
 
 export default function Footer() {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-50px' })
+  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const [time, setTime] = useState(new Date())
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const formatTime = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const seconds = date.getSeconds().toString().padStart(2, '0')
+    return { hours, minutes, seconds }
   }
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: [0.19, 1, 0.22, 1] as [number, number, number, number],
-      },
-    },
-  }
+  const { hours, minutes, seconds } = formatTime(time)
+  const period = time.getHours() >= 12 ? 'PM' : 'AM'
+
+  const services = ['Product Design', 'Development', 'GTM Strategy', 'Healthcare Apps', 'AI Development', 'IoT Development']
+  const atom = ['Atom Enterprise', 'Atom Agentic', 'Atom IntentIQ', 'Compare Atom']
+  const demos = ['Voice Agents', 'Generative UI', 'Sentiment AI']
+  const resources = ['Clinix AI', 'Synergies4', 'Curehire', 'Feature', 'OWASP', 'Contact']
 
   return (
-    <footer className="relative border-t border-white/[0.04] overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[200px] bg-gradient-radial from-ocean/[0.04] to-transparent rounded-full blur-[80px]" />
+    <footer ref={ref} className="relative bg-[#0a0a0a] pt-16 pb-8">
+      {/* CTA Section */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 mb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="relative rounded-3xl overflow-hidden p-8 md:p-12"
+          style={{
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(99, 102, 241, 0.05) 100%)',
+          }}
+        >
+          {/* Glow effects */}
+          <div className="absolute top-0 left-1/4 w-[400px] h-[200px] bg-purple-500/20 blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-0 right-1/4 w-[300px] h-[150px] bg-indigo-500/20 blur-[80px] pointer-events-none" />
+          
+          <div className="relative z-10">
+            <h2 className="text-2xl md:text-4xl font-normal text-white mb-2">
+              We turn bold ideas into
+            </h2>
+            <h2 className="text-2xl md:text-4xl font-normal mb-8">
+              <span className="text-white">powerful </span>
+              <span className="text-indigo-400 italic">digital</span>
+              <span className="text-white"> realities.</span>
+            </h2>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white text-sm transition-all duration-300"
+            >
+              <span>Let's work together</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-white">
+                <path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Top marquee */}
-      <div className="border-b border-white/[0.03] py-5">
-        <MarqueeText
-          text="SkillSailor • AI Agency • Design Studio • Full-Stack Development"
-          className="text-xl sm:text-2xl font-sans font-medium text-white/[0.03]"
-          speed={35}
-        />
-      </div>
+      {/* Main Footer */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-16">
+          {/* Contact Info */}
+          <div className="col-span-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+            >
+              <a href="mailto:hello@skillsailor.com" className="text-white hover:text-gray-300 transition-colors block mb-2">
+                hello@skillsailor.com
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm underline underline-offset-4">
+                LinkedIn ↗
+              </a>
+              <div className="mt-8">
+                <p className="text-gray-500 text-sm">Based in India</p>
+                <p className="text-gray-600 text-xs">Serving clients globally</p>
+              </div>
+            </motion.div>
+          </div>
 
-      <motion.div
-        ref={ref}
-        variants={containerVariants}
-        initial="hidden"
-        animate={inView ? 'visible' : 'hidden'}
-        className="max-w-7xl mx-auto px-6 lg:px-12 py-20 relative"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-          {/* Brand */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
-            <MagneticButton href="#" className="inline-flex items-center gap-3 mb-6 group" strength={0.3}>
-              <motion.div 
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.6 }}
-                className="w-10 h-10 rounded-full border border-ocean/40 flex items-center justify-center group-hover:border-ocean transition-colors"
-              >
-                <div className="w-2.5 h-2.5 rounded-full bg-ocean" />
-              </motion.div>
-              <span className="font-sans text-base font-medium tracking-wide text-off-white group-hover:text-white transition-colors">
-                SkillSailor
-              </span>
-            </MagneticButton>
-            <p className="text-base text-slate leading-relaxed max-w-sm">
-              Navigating enterprises through complex digital waters with
-              custom AI agents and high-end design.
-            </p>
-          </motion.div>
-
-          {/* Navigation */}
-          <motion.div variants={itemVariants}>
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/40 block mb-5">
-              Navigation
-            </span>
-            <div className="flex flex-col gap-4">
-              {links.map((link) => (
-                <MagneticButton
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm text-slate hover:text-ocean transition-colors duration-300 w-fit"
-                  strength={0.15}
+          {/* Services */}
+          <div>
+            <h4 className="text-gray-500 text-xs uppercase tracking-wider mb-4">Services</h4>
+            <ul className="space-y-2">
+              {services.map((item, i) => (
+                <motion.li
+                  key={item}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
                 >
-                  <motion.span
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                    transition={{ duration: 0.2 }}
-                    className="inline-block"
-                  >
-                    {link.label}
-                  </motion.span>
-                </MagneticButton>
+                  <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                    {item}
+                  </a>
+                </motion.li>
               ))}
-            </div>
-          </motion.div>
+            </ul>
+          </div>
 
-          {/* Social */}
-          <motion.div variants={itemVariants}>
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/40 block mb-5">
-              Connect
-            </span>
-            <div className="flex gap-3">
-              {socials.map((link) => (
-                <MagneticButton
-                  key={link.label}
-                  href={link.href}
-                  className="w-11 h-11 rounded-full border border-white/[0.08] flex items-center justify-center text-slate hover:border-ocean/40 hover:text-ocean hover:bg-ocean/5 transition-all duration-300"
-                  strength={0.3}
+          {/* Atom */}
+          <div>
+            <h4 className="text-gray-500 text-xs uppercase tracking-wider mb-4">Solutions</h4>
+            <ul className="space-y-2">
+              {atom.map((item, i) => (
+                <motion.li
+                  key={item}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
                 >
-                  <span className="text-xs font-mono">{link.icon}</span>
-                </MagneticButton>
+                  <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                    {item}
+                  </a>
+                </motion.li>
               ))}
-            </div>
-          </motion.div>
+            </ul>
+          </div>
+
+          {/* Demos */}
+          <div>
+            <h4 className="text-gray-500 text-xs uppercase tracking-wider mb-4">Demos</h4>
+            <ul className="space-y-2">
+              {demos.map((item, i) => (
+                <motion.li
+                  key={item}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                    {item}
+                  </a>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="text-gray-500 text-xs uppercase tracking-wider mb-4">Resources</h4>
+            <ul className="space-y-2">
+              {resources.map((item, i) => (
+                <motion.li
+                  key={item}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+                    {item}
+                  </a>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <motion.div 
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-10 border-t border-white/[0.04]"
+        {/* Live Clock */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex items-end gap-2"
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate/40">
-            &copy; {new Date().getFullYear()} SkillSailor. All rights reserved.
+          <span className="text-6xl md:text-8xl font-light text-white tracking-tight">
+            {hours}
           </span>
-          <motion.span 
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="font-mono text-[10px] uppercase tracking-[0.2em] text-ocean/30"
-          >
-            Designed with precision
-          </motion.span>
+          <span className="text-6xl md:text-8xl font-light text-white tracking-tight">
+            :
+          </span>
+          <span className="text-6xl md:text-8xl font-light text-white tracking-tight">
+            {minutes}
+          </span>
+          <span className="text-6xl md:text-8xl font-light text-white tracking-tight">
+            :
+          </span>
+          <span className="text-6xl md:text-8xl font-light text-white tracking-tight">
+            {seconds}
+          </span>
+          <span className="text-xl md:text-2xl text-gray-400 mb-3 ml-2">
+            {period}
+          </span>
         </motion.div>
-      </motion.div>
+      </div>
     </footer>
   )
 }

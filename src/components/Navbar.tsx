@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navLinks = [
-  { label: 'Work', href: '#voyages' },
-  { label: 'Company', href: '#capabilities' },
-  { label: 'Services', href: '#process' },
-  { label: 'About', href: '#testimonials' },
+  { label: 'Work', href: '#case-studies' },
+  { label: 'Company', href: '#services' },
+  { label: 'Services', href: '#services' },
+  { label: 'Atom AI', href: '#' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -28,21 +28,19 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled 
-            ? 'bg-[#0a0a0a]/90 backdrop-blur-xl' 
-            : 'bg-transparent'
+          scrolled ? 'bg-[#0a0a0a]/90 backdrop-blur-xl' : 'bg-transparent'
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center">
-            <span className="text-white text-lg font-medium tracking-widest">
+            <span className="text-white text-base md:text-lg font-medium tracking-[0.2em]">
               SKILLSAILOR
             </span>
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -60,8 +58,8 @@ export default function Navbar() {
             className="hidden md:flex items-center gap-3 px-5 py-2.5 border border-white/20 rounded-full text-white text-sm hover:bg-white/5 transition-all duration-300"
           >
             <span>Start Your Project</span>
-            <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
+            <span className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
                 <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
