@@ -117,8 +117,8 @@ export default function Services() {
                         <span className="text-2xl font-light text-gray-500">{service.id}</span>
                       )}
                       <span className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center ml-auto">
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-white rotate-[-45deg]">
-                          <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
+                          <path d="M1 11L11 1M11 1H3M11 1V9" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </span>
                     </div>

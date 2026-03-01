@@ -64,7 +64,7 @@ export default function Navbar() {
             <span>Start Your Project</span>
             <span className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
-                <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 11L11 1M11 1H3M11 1V9" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
           </Link>
@@ -126,7 +126,7 @@ export default function Navbar() {
               >
                 <span>Start Your Project</span>
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
-                  <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 11L11 1M11 1H3M11 1V9" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </Link>
             </div>
