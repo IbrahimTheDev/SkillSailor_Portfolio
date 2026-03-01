@@ -1,5 +1,4 @@
-import { useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
 
 interface Point3D {
   x: number
@@ -17,6 +16,7 @@ export default function ParticleSphere() {
   const animationRef = useRef<number | null>(null)
   const rotationRef = useRef({ x: 0, y: 0 })
   const mouseRef = useRef({ x: 0, y: 0 })
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -25,55 +25,85 @@ export default function ParticleSphere() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Get responsive radius based on screen size
+    const getRadius = () => {
+      const width = window.innerWidth
+      if (width < 480) return 100
+      if (width < 768) return 130
+      if (width < 1024) return 160
+      return 180
+    }
+
+    // Get particle count based on screen size (less on mobile for performance)
+    const getParticleCount = () => {
+      const width = window.innerWidth
+      if (width < 480) return { sphere: 400, orbit: 150 }
+      if (width < 768) return { sphere: 500, orbit: 200 }
+      return { sphere: 800, orbit: 300 }
+    }
+
+    let radius = getRadius()
+    let particleCount = getParticleCount()
+
     // Set canvas size
     const setCanvasSize = () => {
-      const dpr = window.devicePixelRatio || 1
+      const dpr = Math.min(window.devicePixelRatio || 1, 2) // Cap DPR for performance
       const rect = canvas.getBoundingClientRect()
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       ctx.scale(dpr, dpr)
+      
+      // Update radius on resize
+      radius = getRadius()
+      particleCount = getParticleCount()
+      initParticles()
     }
+
+    // Initialize particles
+    const initParticles = () => {
+      const particles: Point3D[] = []
+      const orbitingParticles: Point3D[] = []
+      
+      // Fibonacci sphere for even distribution
+      const numPoints = particleCount.sphere
+      const goldenRatio = (1 + Math.sqrt(5)) / 2
+      
+      for (let i = 0; i < numPoints; i++) {
+        const theta = 2 * Math.PI * i / goldenRatio
+        const phi = Math.acos(1 - 2 * (i + 0.5) / numPoints)
+        
+        const x = radius * Math.sin(phi) * Math.cos(theta)
+        const y = radius * Math.sin(phi) * Math.sin(theta)
+        const z = radius * Math.cos(phi)
+        
+        particles.push({ x, y, z, originalX: x, originalY: y, originalZ: z })
+      }
+
+      // Create orbiting particles
+      const numOrbiting = particleCount.orbit
+      for (let i = 0; i < numOrbiting; i++) {
+        const orbitRadius = radius + 20 + Math.random() * 60
+        const theta = Math.random() * Math.PI * 2
+        const phi = Math.random() * Math.PI
+        
+        const x = orbitRadius * Math.sin(phi) * Math.cos(theta)
+        const y = orbitRadius * Math.sin(phi) * Math.sin(theta)
+        const z = orbitRadius * Math.cos(phi)
+        
+        orbitingParticles.push({ x, y, z, originalX: x, originalY: y, originalZ: z })
+      }
+
+      particlesRef.current = particles
+      orbitingParticlesRef.current = orbitingParticles
+    }
+
     setCanvasSize()
+    initParticles()
+    setIsReady(true)
+    
     window.addEventListener('resize', setCanvasSize)
 
-    // Create sphere points
-    const radius = 180
-    const particles: Point3D[] = []
-    const orbitingParticles: Point3D[] = []
-    
-    // Fibonacci sphere for even distribution
-    const numPoints = 800
-    const goldenRatio = (1 + Math.sqrt(5)) / 2
-    
-    for (let i = 0; i < numPoints; i++) {
-      const theta = 2 * Math.PI * i / goldenRatio
-      const phi = Math.acos(1 - 2 * (i + 0.5) / numPoints)
-      
-      const x = radius * Math.sin(phi) * Math.cos(theta)
-      const y = radius * Math.sin(phi) * Math.sin(theta)
-      const z = radius * Math.cos(phi)
-      
-      particles.push({ x, y, z, originalX: x, originalY: y, originalZ: z })
-    }
-
-    // Create orbiting particles
-    const numOrbiting = 300
-    for (let i = 0; i < numOrbiting; i++) {
-      const orbitRadius = radius + 30 + Math.random() * 80
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.random() * Math.PI
-      
-      const x = orbitRadius * Math.sin(phi) * Math.cos(theta)
-      const y = orbitRadius * Math.sin(phi) * Math.sin(theta)
-      const z = orbitRadius * Math.cos(phi)
-      
-      orbitingParticles.push({ x, y, z, originalX: x, originalY: y, originalZ: z })
-    }
-
-    particlesRef.current = particles
-    orbitingParticlesRef.current = orbitingParticles
-
-    // Mouse tracking
+    // Mouse/Touch tracking
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
       mouseRef.current = {
@@ -81,7 +111,19 @@ export default function ParticleSphere() {
         y: (e.clientY - rect.top - rect.height / 2) / rect.height,
       }
     }
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect()
+        mouseRef.current = {
+          x: (e.touches[0].clientX - rect.left - rect.width / 2) / rect.width,
+          y: (e.touches[0].clientY - rect.top - rect.height / 2) / rect.height,
+        }
+      }
+    }
+    
     window.addEventListener('mousemove', handleMouseMove)
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: true })
 
     // Rotate point around Y axis
     const rotateY = (point: Point3D, angle: number) => {
@@ -119,11 +161,12 @@ export default function ParticleSphere() {
 
       // Draw main sphere fill
       const gradient = ctx.createRadialGradient(
-        centerX - 30, centerY - 30, 0,
+        centerX - radius * 0.15, centerY - radius * 0.15, 0,
         centerX, centerY, radius
       )
-      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)')
-      gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.2)')
+      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)')
+      gradient.addColorStop(0.4, 'rgba(99, 102, 241, 0.3)')
+      gradient.addColorStop(0.7, 'rgba(99, 102, 241, 0.15)')
       gradient.addColorStop(1, 'rgba(99, 102, 241, 0.05)')
       
       ctx.beginPath()
@@ -146,20 +189,21 @@ export default function ParticleSphere() {
           x: centerX + rotated.x,
           y: centerY + rotated.y,
           z: rotated.z,
-          size: 1.5 * scale,
-          opacity: opacity * 0.6,
+          size: Math.max(0.8, 1.5 * scale),
+          opacity: opacity * 0.7,
           isOrbiting: false,
         })
       })
 
       // Add orbiting particles
+      const time = Date.now() * 0.001
       orbitingParticlesRef.current.forEach((particle, i) => {
         // Add some wobble to orbiting particles
-        const wobble = Math.sin(Date.now() * 0.001 + i * 0.1) * 5
+        const wobble = Math.sin(time + i * 0.1) * 5
         const modifiedParticle = {
           ...particle,
           x: particle.x + wobble,
-          y: particle.y + Math.cos(Date.now() * 0.0015 + i * 0.1) * 3,
+          y: particle.y + Math.cos(time * 1.5 + i * 0.1) * 3,
           z: particle.z,
         }
         
@@ -173,8 +217,8 @@ export default function ParticleSphere() {
           x: centerX + rotated.x,
           y: centerY + rotated.y,
           z: rotated.z,
-          size: 1.2 * scale,
-          opacity: opacity * 0.4,
+          size: Math.max(0.6, 1.2 * scale),
+          opacity: opacity * 0.5,
           isOrbiting: true,
         })
       })
@@ -197,11 +241,13 @@ export default function ParticleSphere() {
       animationRef.current = requestAnimationFrame(animate)
     }
 
+    // Start animation immediately
     animate()
 
     return () => {
       window.removeEventListener('resize', setCanvasSize)
       window.removeEventListener('mousemove', handleMouseMove)
+      canvas.removeEventListener('touchmove', handleTouchMove)
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
       }
@@ -209,17 +255,12 @@ export default function ParticleSphere() {
   }, [])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1.5, ease: [0.19, 1, 0.22, 1] }}
-      className="relative w-full h-full"
-    >
+    <div className={`relative w-full h-full transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
       <canvas
         ref={canvasRef}
         className="w-full h-full"
         style={{ width: '100%', height: '100%' }}
       />
-    </motion.div>
+    </div>
   )
 }
