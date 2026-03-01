@@ -1,5 +1,6 @@
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { motion, useScroll, useTransform, useInView, MotionValue, useSpring } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
+import { RevealOnScroll, SplitTextLine } from './animations'
 
 const caseStudies = [
   {
@@ -47,112 +48,149 @@ const caseStudies = [
 function CaseStudyCard({
   study,
   index,
+  progress,
 }: {
   study: (typeof caseStudies)[0]
   index: number
+  progress: MotionValue<number>
 }) {
   const cardRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start end', 'end start'],
-  })
-  const scale = useTransform(scrollYProgress, [0, 0.5], [0.95, 1])
-  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.05])
+  const [isHovered, setIsHovered] = useState(false)
   const inView = useInView(cardRef, { once: true, margin: '-100px' })
+  
+  const springConfig = { stiffness: 100, damping: 30 }
+  const rotateY = useSpring(useTransform(progress, [0, 1], [-5, 5]), springConfig)
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 60 }}
+      initial={{ opacity: 0, y: 100 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{
-        duration: 0.8,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 1,
+        ease: [0.19, 1, 0.22, 1],
         delay: index * 0.15,
       }}
-      style={{ scale }}
+      style={{ rotateY: index % 2 === 0 ? rotateY : undefined }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       data-cursor="pointer"
-      className="group"
+      className="group flex-shrink-0 w-[85vw] md:w-[600px] lg:w-[700px]"
     >
-      <div className="relative rounded-2xl overflow-hidden border border-white/[0.04] hover:border-white/[0.08] transition-all duration-700">
-        {/* Image area */}
-        <motion.div
-          style={{ scale: imageScale }}
-          className="relative h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden"
-        >
-          <div
+      <div className="relative rounded-3xl overflow-hidden border border-white/[0.04] hover:border-ocean/20 transition-all duration-700 h-full bg-deep-100/50">
+        {/* Image area with parallax */}
+        <div className="relative h-[350px] sm:h-[400px] lg:h-[450px] overflow-hidden">
+          <motion.div
+            animate={{ scale: isHovered ? 1.1 : 1 }}
+            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
             className="absolute inset-0"
             style={{ background: study.image }}
           />
-          {/* Floating elements inside cards */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+          
+          {/* Dynamic gradient overlay */}
+          <motion.div
+            animate={{ opacity: isHovered ? 0.6 : 0.3 }}
+            className="absolute inset-0 bg-gradient-to-t from-deep via-transparent to-transparent"
+          />
+          
+          {/* Floating elements */}
+          <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 40,
-                repeat: Infinity,
-                ease: 'linear',
+              animate={{ 
+                rotate: 360,
+                scale: isHovered ? 1.2 : 1,
               }}
-              className="w-[200px] h-[200px] border border-white/20 rounded-full"
+              transition={{
+                rotate: { duration: 40, repeat: Infinity, ease: 'linear' },
+                scale: { duration: 0.6 },
+              }}
+              className="w-[180px] h-[180px] border border-white/10 rounded-full opacity-30"
             />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
             <motion.div
-              animate={{ rotate: -360 }}
-              transition={{
-                duration: 60,
-                repeat: Infinity,
-                ease: 'linear',
+              animate={{ 
+                rotate: -360,
+                scale: isHovered ? 1.3 : 1,
               }}
-              className="w-[300px] h-[300px] border border-white/10 rounded-full"
+              transition={{
+                rotate: { duration: 50, repeat: Infinity, ease: 'linear' },
+                scale: { duration: 0.6 },
+              }}
+              className="absolute w-[260px] h-[260px] border border-white/5 rounded-full opacity-20"
             />
           </div>
 
-          {/* Result badge */}
-          <div className="absolute top-6 right-6 px-4 py-2 bg-black/40 backdrop-blur-xl border border-white/[0.08] rounded-full">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ocean">
-              {study.result}
-            </span>
-          </div>
-        </motion.div>
+          {/* Result badge with animation */}
+          <motion.div 
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 + index * 0.1 }}
+            className="absolute top-6 right-6"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="px-5 py-2.5 bg-black/50 backdrop-blur-xl border border-white/[0.1] rounded-full"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ocean">
+                {study.result}
+              </span>
+            </motion.div>
+          </motion.div>
 
-        {/* Info area */}
-        <div className="p-8 sm:p-10 bg-deep-100/80">
-          <div className="flex items-center gap-4 mb-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/60">
+          {/* Index number */}
+          <div className="absolute bottom-6 left-6 font-mono text-[80px] font-bold text-white/[0.03] leading-none">
+            {String(index + 1).padStart(2, '0')}
+          </div>
+        </div>
+
+        {/* Info area with staggered reveal */}
+        <div className="p-8 sm:p-10 relative">
+          <motion.div 
+            className="flex items-center gap-4 mb-5"
+            initial={{ opacity: 0, x: -20 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.4 + index * 0.1 }}
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/70">
               {String(index + 1).padStart(2, '0')}
             </span>
-            <span className="w-4 h-px bg-white/10" />
+            <motion.span 
+              animate={{ scaleX: isHovered ? 1.5 : 1 }}
+              className="w-6 h-px bg-ocean/30 origin-left"
+            />
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate">
               {study.industry}
             </span>
-          </div>
+          </motion.div>
 
-          <h3 className="text-2xl sm:text-3xl font-sans font-medium text-off-white mb-3 group-hover:text-white transition-colors duration-300">
-            {study.title}
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-sans font-medium text-off-white mb-4 group-hover:text-white transition-colors duration-300">
+            <SplitTextLine delay={0.2 + index * 0.1}>{study.title}</SplitTextLine>
           </h3>
 
-          <p className="text-sm text-slate leading-relaxed max-w-lg">
+          <p className="text-sm sm:text-base text-slate leading-relaxed max-w-lg mb-6">
             {study.description}
           </p>
 
-          <div className="mt-6 flex items-center gap-2 text-ocean/50 group-hover:text-ocean transition-all duration-500">
+          <motion.div 
+            className="flex items-center gap-3 text-ocean/50 group-hover:text-ocean transition-all duration-500"
+            whileHover={{ x: 5 }}
+          >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em]">
               View case study
             </span>
             <motion.svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
-              className="group-hover:translate-x-1 transition-transform duration-300"
+              animate={{ x: isHovered ? 5 : 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <line x1="0" y1="7" x2="12" y2="7" />
-              <polyline points="8,3 12,7 8,11" />
+              <line x1="0" y1="10" x2="16" y2="10" />
+              <polyline points="11,5 16,10 11,15" />
             </motion.svg>
-          </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>
@@ -160,38 +198,103 @@ function CaseStudyCard({
 }
 
 export default function CaseStudies() {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const sectionRef = useRef<HTMLElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerWidth, setContainerWidth] = useState(0)
+  const headerRef = useRef(null)
+  const headerInView = useInView(headerRef, { once: true, margin: '-100px' })
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const scrollWidth = containerRef.current.scrollWidth
+      const clientWidth = containerRef.current.clientWidth
+      setContainerWidth(scrollWidth - clientWidth)
+    }
+  }, [])
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  })
+
+  const x = useTransform(scrollYProgress, [0.1, 0.9], [0, -containerWidth])
+  const progressBar = useTransform(scrollYProgress, [0.1, 0.9], ['0%', '100%'])
 
   return (
-    <section id="voyages" className="relative py-32 sm:py-40">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section ref={sectionRef} id="voyages" className="relative h-[300vh]">
+      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+          <RevealOnScroll animation="fadeUp" className="mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div ref={headerRef}>
+              <motion.span 
+                initial={{ opacity: 0, y: 20 }}
+                animate={headerInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6 }}
+                className="font-mono text-[10px] uppercase tracking-[0.4em] text-ocean/60 block mb-4"
+              >
+                Our work
+              </motion.span>
+              <h2 className="text-4xl sm:text-5xl lg:text-7xl font-sans font-semibold tracking-tight text-off-white">
+                <SplitTextLine>Selected Voyages</SplitTextLine>
+              </h2>
+            </div>
+            <div className="flex flex-col items-start sm:items-end gap-3">
+              <p className="text-sm text-slate max-w-sm">
+                Each project is a journey. Here are the destinations we've reached
+                with our partners.
+              </p>
+              {/* Progress bar */}
+              <div className="w-32 h-px bg-white/[0.06] rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-ocean rounded-full"
+                  style={{ width: progressBar }}
+                />
+              </div>
+            </div>
+          </RevealOnScroll>
+        </div>
+
+        {/* Horizontal scroll container */}
         <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16 sm:mb-20 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
+          ref={containerRef}
+          style={{ x }}
+          className="flex gap-8 pl-6 lg:pl-12 pr-[20vw]"
         >
-          <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-ocean/60 block mb-4">
-              Our work
-            </span>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-sans font-semibold tracking-tight text-off-white">
-              Selected Voyages
-            </h2>
-          </div>
-          <p className="text-sm text-slate max-w-sm">
-            Each project is a journey. Here are the destinations we've reached
-            with our partners.
-          </p>
+          {caseStudies.map((study, i) => (
+            <CaseStudyCard 
+              key={study.title} 
+              study={study} 
+              index={i}
+              progress={scrollYProgress}
+            />
+          ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          {caseStudies.map((study, i) => (
-            <CaseStudyCard key={study.title} study={study} index={i} />
-          ))}
-        </div>
+        {/* Navigation hints */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4"
+        >
+          <motion.div
+            animate={{ x: [-10, 10, -10] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex items-center gap-2 text-slate/40"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1">
+              <line x1="12" y1="8" x2="4" y2="8" />
+              <polyline points="7,4 3,8 7,12" />
+            </svg>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em]">
+              Scroll to explore
+            </span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1">
+              <line x1="4" y1="8" x2="12" y2="8" />
+              <polyline points="9,4 13,8 9,12" />
+            </svg>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )

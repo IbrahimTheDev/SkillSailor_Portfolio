@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navLinks = [
-  { label: 'Capabilities', href: '#capabilities' },
-  { label: 'Voyages', href: '#voyages' },
-  { label: 'Process', href: '#process' },
+  { label: 'Work', href: '#voyages' },
+  { label: 'Company', href: '#capabilities' },
+  { label: 'Services', href: '#process' },
+  { label: 'About', href: '#testimonials' },
   { label: 'Contact', href: '#contact' },
 ]
 
@@ -13,94 +14,117 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
-    <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'bg-deep/80 backdrop-blur-xl border-b border-white/[0.04]' : ''
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-full border border-ocean/40 flex items-center justify-center group-hover:border-ocean transition-colors duration-300">
-            <div className="w-2 h-2 rounded-full bg-ocean" />
-          </div>
-          <span className="font-sans text-sm font-medium tracking-wide text-off-white">
-            SkillSailor
-          </span>
-        </a>
+    <>
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled 
+            ? 'bg-[#0a0a0a]/90 backdrop-blur-xl' 
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+          {/* Logo */}
+          <a href="#" className="flex items-center">
+            <span className="text-white text-lg font-medium tracking-widest">
+              SKILLSAILOR
+            </span>
+          </a>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-10">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="font-mono text-xs uppercase tracking-[0.2em] text-slate hover:text-ocean transition-colors duration-300"
-            >
-              {link.label}
-            </a>
-          ))}
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-10">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-gray-400 hover:text-white text-sm transition-colors duration-300"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          {/* CTA Button */}
           <a
             href="#contact"
-            className="ml-4 px-5 py-2 border border-ocean/30 rounded-full font-mono text-xs uppercase tracking-[0.15em] text-ocean hover:bg-ocean/10 transition-all duration-300"
+            className="hidden md:flex items-center gap-3 px-5 py-2.5 border border-white/20 rounded-full text-white text-sm hover:bg-white/5 transition-all duration-300"
           >
-            Start a Voyage
+            <span>Start Your Project</span>
+            <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
+                <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
           </a>
-        </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden flex flex-col gap-1.5 p-2"
-          aria-label="Toggle menu"
-        >
-          <motion.span
-            animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-            className="block w-6 h-[1px] bg-off-white"
-          />
-          <motion.span
-            animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
-            className="block w-6 h-[1px] bg-off-white"
-          />
-          <motion.span
-            animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-            className="block w-6 h-[1px] bg-off-white"
-          />
-        </button>
-      </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden relative w-10 h-10 flex items-center justify-center"
+            aria-label="Toggle menu"
+          >
+            <div className="relative w-6 h-4">
+              <motion.span
+                animate={menuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+                className="absolute top-0 left-0 w-full h-[1.5px] bg-white origin-center"
+              />
+              <motion.span
+                animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
+                className="absolute top-1/2 left-0 w-full h-[1.5px] bg-white -translate-y-1/2"
+              />
+              <motion.span
+                animate={menuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+                className="absolute bottom-0 left-0 w-full h-[1.5px] bg-white origin-center"
+              />
+            </div>
+          </button>
+        </div>
+      </motion.nav>
 
       {/* Mobile menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-deep/95 backdrop-blur-xl border-t border-white/[0.04] overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 md:hidden bg-[#0a0a0a] pt-20"
           >
             <div className="px-6 py-8 flex flex-col gap-6">
-              {navLinks.map((link) => (
-                <a
+              {navLinks.map((link, i) => (
+                <motion.a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="font-mono text-sm uppercase tracking-[0.2em] text-slate hover:text-ocean transition-colors"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-2xl text-white"
                 >
                   {link.label}
-                </a>
+                </motion.a>
               ))}
+              <a
+                href="#contact"
+                onClick={() => setMenuOpen(false)}
+                className="mt-4 inline-flex items-center gap-3 px-6 py-3 bg-orange-500 rounded-full text-white text-sm w-fit"
+              >
+                Start Your Project
+              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   )
 }

@@ -1,5 +1,6 @@
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion'
 import { useRef, useState } from 'react'
+import { RevealOnScroll, SplitTextLine } from './animations'
 
 const capabilities = [
   {
@@ -72,86 +73,120 @@ function BentoCard({
 }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
+
+  // Mouse tracking for glow effect
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const springX = useSpring(mouseX, { stiffness: 500, damping: 50 })
+  const springY = useSpring(mouseY, { stiffness: 500, damping: 50 })
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    })
+    mouseX.set(e.clientX - rect.left)
+    mouseY.set(e.clientY - rect.top)
   }
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+      initial={{ opacity: 0, y: 60, rotateX: -10 }}
+      animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
       transition={{
-        duration: 0.7,
-        ease: [0.22, 1, 0.36, 1],
-        delay: index * 0.1,
+        duration: 0.9,
+        ease: [0.19, 1, 0.22, 1],
+        delay: index * 0.12,
       }}
       className={item.span}
+      style={{ perspective: '1000px' }}
     >
-      <div
+      <motion.div
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         data-cursor="pointer"
-        className="relative group h-full p-8 sm:p-10 rounded-2xl border border-white/[0.04] bg-deep-100/50 hover:border-ocean/20 transition-all duration-700 overflow-hidden"
+        whileHover={{ y: -8, transition: { duration: 0.4 } }}
+        className="relative group h-full p-8 sm:p-10 rounded-3xl border border-white/[0.04] bg-gradient-to-br from-deep-100/80 to-deep-200/50 hover:border-ocean/20 transition-all duration-700 overflow-hidden"
       >
-        {/* Glow on hover that follows mouse */}
-        {isHovered && (
-          <div
-            className="absolute w-[300px] h-[300px] rounded-full bg-ocean/[0.06] blur-[80px] pointer-events-none transition-opacity duration-500"
-            style={{
-              left: mousePos.x - 150,
-              top: mousePos.y - 150,
-            }}
-          />
-        )}
+        {/* Animated glow that follows mouse */}
+        <motion.div
+          className="absolute w-[350px] h-[350px] rounded-full pointer-events-none transition-opacity duration-500"
+          style={{
+            background: 'radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)',
+            left: springX,
+            top: springY,
+            x: '-50%',
+            y: '-50%',
+            opacity: isHovered ? 1 : 0,
+          }}
+        />
+
+        {/* Border glow on hover */}
+        <motion.div
+          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,212,255,0.1) 0%, transparent 50%, rgba(0,212,255,0.05) 100%)',
+          }}
+        />
 
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/60">
+            <motion.span 
+              initial={{ opacity: 0, x: -20 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ delay: 0.3 + index * 0.1 }}
+              className="font-mono text-[10px] uppercase tracking-[0.3em] text-ocean/60"
+            >
               {item.label}
-            </span>
-            <div className="text-ocean/40 group-hover:text-ocean/70 transition-colors duration-500">
+            </motion.span>
+            <motion.div 
+              animate={{ 
+                rotate: isHovered ? 90 : 0,
+                scale: isHovered ? 1.2 : 1,
+              }}
+              transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+              className="text-ocean/40 group-hover:text-ocean/80 transition-colors duration-500"
+            >
               {item.icon}
-            </div>
+            </motion.div>
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-sans font-medium text-off-white mb-4 group-hover:text-white transition-colors duration-500">
-            {item.title}
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-sans font-medium text-off-white mb-4 group-hover:text-white transition-colors duration-500">
+            <SplitTextLine delay={index * 0.1}>{item.title}</SplitTextLine>
           </h3>
 
           <p className="text-sm sm:text-base text-slate leading-relaxed max-w-md">
             {item.description}
           </p>
 
-          <div className="mt-8 flex items-center gap-2 text-ocean/0 group-hover:text-ocean/70 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em]">
+          <motion.div 
+            className="mt-8 flex items-center gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ocean/70">
               Learn more
             </span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
+            <motion.svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
+              className="text-ocean/70"
+              animate={{ x: isHovered ? 5 : 0 }}
             >
-              <line x1="0" y1="7" x2="12" y2="7" />
-              <polyline points="8,3 12,7 8,11" />
-            </svg>
-          </div>
+              <line x1="0" y1="8" x2="12" y2="8" />
+              <polyline points="8,4 12,8 8,12" />
+            </motion.svg>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -161,24 +196,45 @@ export default function Capabilities() {
   const inView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
-    <section id="capabilities" className="relative py-32 sm:py-40">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section id="capabilities" className="relative py-32 sm:py-40 overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16 sm:mb-20"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-ocean/60 block mb-4">
-            What we do
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-sans font-semibold tracking-tight text-off-white">
-            Capabilities
-          </h2>
-        </motion.div>
+          animate={{ 
+            rotate: 360,
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ 
+            rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
+            scale: { duration: 8, repeat: Infinity, ease: 'easeInOut' },
+          }}
+          className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] border border-ocean/[0.03] rounded-full"
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
+          className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] border border-ocean/[0.02] rounded-full"
+        />
+      </div>
 
-        <div className="grid grid-cols-12 gap-4 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative">
+        <RevealOnScroll animation="fadeUp" className="mb-16 sm:mb-24">
+          <div ref={ref}>
+            <motion.span 
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+              className="font-mono text-[10px] uppercase tracking-[0.4em] text-ocean/60 block mb-4"
+            >
+              What we do
+            </motion.span>
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-sans font-semibold tracking-tight text-off-white">
+              <SplitTextLine>Capabilities</SplitTextLine>
+            </h2>
+          </div>
+        </RevealOnScroll>
+
+        <div className="grid grid-cols-12 gap-5 sm:gap-6">
           {capabilities.map((item, i) => (
             <BentoCard key={item.label} item={item} index={i} />
           ))}
