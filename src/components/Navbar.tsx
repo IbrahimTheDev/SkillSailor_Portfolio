@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Link, useLocation } from 'react-router-dom'
 
 const navLinks = [
-  { label: 'Work', href: '#case-studies' },
-  { label: 'Company', href: '#services' },
-  { label: 'Services', href: '#services' },
-  { label: 'Atom AI', href: '#' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Work', href: '/work' },
+  { label: 'Company', href: '/company' },
+  { label: 'Services', href: '/services' },
+  { label: 'Atom AI', href: '/atom-ai' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,28 +35,30 @@ export default function Navbar() {
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 h-20 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <span className="text-white text-base md:text-lg font-medium tracking-[0.2em]">
               SKILLSAILOR
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
-                className="text-gray-400 hover:text-white text-sm transition-colors duration-300"
+                to={link.href}
+                className={`text-sm transition-colors duration-300 ${
+                  location.pathname === link.href ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
           {/* CTA Button */}
-          <a
-            href="#contact"
+          <Link
+            to="/contact"
             className="hidden md:flex items-center gap-3 px-5 py-2.5 border border-white/20 rounded-full text-white text-sm hover:bg-white/5 transition-all duration-300"
           >
             <span>Start Your Project</span>
@@ -63,7 +67,7 @@ export default function Navbar() {
                 <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
-          </a>
+          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -100,25 +104,31 @@ export default function Navbar() {
           >
             <div className="px-6 py-8 flex flex-col gap-6">
               {navLinks.map((link, i) => (
-                <motion.a
+                <motion.div
                   key={link.label}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="text-2xl text-white"
                 >
-                  {link.label}
-                </motion.a>
+                  <Link
+                    to={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`text-2xl ${location.pathname === link.href ? 'text-indigo-400' : 'text-white'}`}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               ))}
-              <a
-                href="#contact"
+              <Link
+                to="/contact"
                 onClick={() => setMenuOpen(false)}
-                className="mt-4 inline-flex items-center gap-3 px-6 py-3 bg-orange-500 rounded-full text-white text-sm w-fit"
+                className="mt-4 inline-flex items-center gap-3 px-6 py-3 bg-indigo-600 rounded-full text-white text-sm w-fit"
               >
-                Start Your Project
-              </a>
+                <span>Start Your Project</span>
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="rotate-[-45deg]">
+                  <path d="M1 11L11 1M11 1H3M11 1V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
             </div>
           </motion.div>
         )}
