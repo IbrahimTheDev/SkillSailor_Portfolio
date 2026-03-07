@@ -25,13 +25,12 @@ export default function ParticleSphere() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Get responsive radius based on screen size
+    // Get responsive radius based on container size
     const getRadius = () => {
-      const width = window.innerWidth
-      if (width < 480) return 100
-      if (width < 768) return 130
-      if (width < 1024) return 160
-      return 180
+      const rect = canvas.getBoundingClientRect()
+      const size = Math.min(rect.width, rect.height)
+      // Sphere + orbiting particles need ~1.45x radius, so keep main radius at ~35% of container
+      return Math.max(80, Math.floor(size * 0.35))
     }
 
     // Get particle count based on screen size (less on mobile for performance)

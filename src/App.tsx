@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useLenis } from './hooks/useLenis'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -9,11 +10,20 @@ import ServicesPage from './pages/ServicesPage'
 import AtomAIPage from './pages/AtomAIPage'
 import ContactPage from './pages/ContactPage'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
 function AppContent() {
   useLenis()
 
   return (
     <>
+      <ScrollToTop />
       <Navbar />
       <main className="bg-[#0a0a0a]">
         <Routes>
