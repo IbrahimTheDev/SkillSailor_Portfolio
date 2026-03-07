@@ -51,15 +51,16 @@ export default function HomePage() {
         ease: 'none',
       })
 
-      // Fade out when scrolling past services
+      // Fade out sphere at the end of pinned services section
       gsap.to(sphere, {
         scrollTrigger: {
           trigger: servicesEl,
-          start: 'bottom 60%',
-          end: 'bottom 20%',
+          start: 'bottom 80%',
+          end: 'bottom 40%',
           scrub: 1,
         },
         opacity: 0,
+        scale: 0.8,
         ease: 'none',
       })
     })

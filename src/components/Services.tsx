@@ -1,5 +1,9 @@
-import { motion, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const services = [
   {
@@ -7,40 +11,61 @@ const services = [
     title: 'Product Design',
     description: 'End-to-end product design—from research and UX flows to polished UI systems and developer-ready handoff.',
     services: ['User Research & Strategy', 'UX Flows & Wireframes', 'UI Systems & Prototypes', 'Design Ops & Dev Handoff'],
-    active: true,
   },
   {
     id: '02',
     title: 'Development',
     description: 'Full-stack engineering from cloud infrastructure to pixel-perfect frontends built for scale.',
     services: ['Frontend Development', 'Backend Systems', 'Cloud Infrastructure', 'API Development'],
-    active: false,
   },
   {
     id: '03',
     title: 'AI Solutions',
     description: 'Custom AI agents and automation that transform complex challenges into advantages.',
     services: ['AI Agents', 'ML Models', 'Data Analytics', 'Automation'],
-    active: false,
   },
   {
     id: '04',
     title: 'GTM Strategy',
     description: 'Go-to-market strategies that position your product for maximum impact.',
     services: ['Market Research', 'Brand Strategy', 'Launch Planning', 'Growth'],
-    active: false,
   },
 ]
 
 export default function Services() {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const sectionRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${window.innerHeight * (services.length - 1)}`,
+      pin: true,
+      scrub: true,
+      onUpdate: (self) => {
+        const idx = Math.min(
+          services.length - 1,
+          Math.floor(self.progress * services.length)
+        )
+        setActiveIndex(idx)
+      },
+    })
+
+    return () => trigger.kill()
+  }, [])
+
   return (
-    <section id="services" className="relative py-24 md:py-32 overflow-hidden bg-[#0a0a0a]">
+    <section
+      ref={sectionRef}
+      id="services"
+      className="relative min-h-screen py-24 md:py-32 overflow-hidden bg-[#0a0a0a]"
+    >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div ref={ref} className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
           {/* Spacer for scroll-animated sphere */}
           <div className="hidden lg:block lg:col-span-4" />
@@ -49,22 +74,12 @@ export default function Services() {
           <div className="lg:col-span-8">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-10">
-              <motion.h2
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8 }}
-                className="text-4xl md:text-5xl font-normal text-white"
-              >
+              <h2 className="text-4xl md:text-5xl font-normal text-white">
                 Our Services
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.1 }}
-                className="text-gray-400 text-sm leading-relaxed max-w-xs"
-              >
+              </h2>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
                 We offer comprehensive digital solutions that transform your business and drive innovation across every touchpoint.
-              </motion.p>
+              </p>
             </div>
 
             {/* Service Cards */}
@@ -72,11 +87,9 @@ export default function Services() {
               {services.map((service, index) => (
                 <motion.div
                   key={service.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  onClick={() => setActiveIndex(index)}
-                  className={`relative cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 ${
+                  layout
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                  className={`relative rounded-2xl overflow-hidden transition-colors duration-500 ${
                     activeIndex === index 
                       ? 'bg-indigo-600 sm:col-span-2 lg:col-span-2 row-span-2' 
                       : 'bg-[#12121a] hover:bg-[#16161f]'
