@@ -13,6 +13,7 @@ export function useLenis() {
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 2,
+      syncTouch: true,
     })
 
     lenisRef.current = lenis
@@ -25,6 +26,9 @@ export function useLenis() {
     }
     gsap.ticker.add(rafCallback)
     gsap.ticker.lagSmoothing(0)
+
+    // Refresh ScrollTrigger after Lenis is ready
+    ScrollTrigger.refresh()
 
     return () => {
       gsap.ticker.remove(rafCallback)

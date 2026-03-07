@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenis } from './hooks/useLenis'
+
+gsap.registerPlugin(ScrollTrigger)
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -14,6 +18,8 @@ function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => {
     window.scrollTo(0, 0)
+    // Also refresh ScrollTrigger positions after route change
+    setTimeout(() => ScrollTrigger.refresh(), 100)
   }, [pathname])
   return null
 }

@@ -40,37 +40,48 @@ export default function Services() {
     const section = sectionRef.current
     if (!section) return
 
-    const trigger = ScrollTrigger.create({
-      trigger: section,
-      start: 'top top',
-      end: () => `+=${window.innerHeight * 1.2}`,
-      pin: true,
-      scrub: 0.3,
-      snap: {
-        snapTo: 1 / (services.length - 1),
-        duration: { min: 0.2, max: 0.4 },
-        ease: 'power2.inOut',
-      },
-      onUpdate: (self) => {
-        const idx = Math.min(
-          services.length - 1,
-          Math.round(self.progress * (services.length - 1))
-        )
-        setActiveIndex(idx)
-      },
+    const mm = gsap.matchMedia()
+
+    // Only pin on large screens where grid layout works
+    mm.add('(min-width: 1024px)', () => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${window.innerHeight * 1.2}`,
+        pin: true,
+        pinSpacing: true,
+        scrub: 0.3,
+        snap: {
+          snapTo: 1 / (services.length - 1),
+          duration: { min: 0.2, max: 0.4 },
+          ease: 'power2.inOut',
+        },
+        onUpdate: (self) => {
+          const idx = Math.min(
+            services.length - 1,
+            Math.round(self.progress * (services.length - 1))
+          )
+          setActiveIndex(idx)
+        },
+      })
     })
 
-    return () => trigger.kill()
+    // On mobile/tablet: no pinning, just scroll through normally
+    mm.add('(max-width: 1023px)', () => {
+      // No pin, no snap - static layout
+    })
+
+    return () => mm.revert()
   }, [])
 
   return (
     <section
       ref={sectionRef}
       id="services"
-      className="relative min-h-screen py-24 md:py-32 overflow-hidden bg-[#0a0a0a]"
+      className="relative lg:h-screen py-24 md:py-32 lg:py-0 overflow-hidden bg-[#0a0a0a]"
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start lg:items-center lg:h-screen lg:py-16">
           
           {/* Spacer for scroll-animated sphere */}
           <div className="hidden lg:block lg:col-span-4" />
