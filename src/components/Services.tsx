@@ -43,13 +43,18 @@ export default function Services() {
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
-      end: () => `+=${window.innerHeight * (services.length - 1)}`,
+      end: () => `+=${window.innerHeight * 1.2}`,
       pin: true,
-      scrub: true,
+      scrub: 0.3,
+      snap: {
+        snapTo: 1 / (services.length - 1),
+        duration: { min: 0.2, max: 0.4 },
+        ease: 'power2.inOut',
+      },
       onUpdate: (self) => {
         const idx = Math.min(
           services.length - 1,
-          Math.floor(self.progress * services.length)
+          Math.round(self.progress * (services.length - 1))
         )
         setActiveIndex(idx)
       },

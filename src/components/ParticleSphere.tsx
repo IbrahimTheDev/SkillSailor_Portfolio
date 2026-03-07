@@ -152,9 +152,9 @@ export default function ParticleSphere() {
       const rect = canvas.getBoundingClientRect()
       ctx.clearRect(0, 0, rect.width, rect.height)
 
-      // Update rotation based on mouse
-      rotationRef.current.y += 0.003 + mouseRef.current.x * 0.01
-      rotationRef.current.x = mouseRef.current.y * 0.3
+      // Update rotation based on mouse (slow rotation)
+      rotationRef.current.y += 0.001 + mouseRef.current.x * 0.004
+      rotationRef.current.x = mouseRef.current.y * 0.15
 
       const centerX = rect.width / 2
       const centerY = rect.height / 2
