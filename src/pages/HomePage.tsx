@@ -20,7 +20,7 @@ export default function HomePage() {
     const servicesEl = servicesRef.current
     if (!sphere || !heroEl || !servicesEl) return
 
-    // Set initial position — GSAP owns all transforms, no Tailwind translate
+    // GSAP owns all transforms
     gsap.set(sphere, {
       left: '50%',
       top: '50%',
@@ -33,63 +33,68 @@ export default function HomePage() {
     const mm = gsap.matchMedia()
 
     mm.add('(min-width: 1024px)', () => {
-      // Calculate the target left position (center of services left column, shifted left to avoid overlap)
       const getTargetLeft = () => {
         const vw = window.innerWidth
         const maxW = Math.min(1400, vw)
         const containerLeft = (vw - maxW) / 2
         const padding = 48
         const gridWidth = maxW - padding * 2
-        const colCenter = containerLeft + padding + (gridWidth * 4 / 12) / 2
-        return colCenter - 60
+        return containerLeft + padding + (gridWidth * 4 / 12) / 2
       }
 
-      // Timeline: move sphere from hero center → services left column
+      // Single timeline: hero center → shrink/dim during transit → land at services left
       const moveTl = gsap.timeline({
         scrollTrigger: {
           trigger: heroEl,
           start: 'center center',
           endTrigger: servicesEl,
-          end: 'top 30%',
-          scrub: 1.5,
+          end: 'top 20%',
+          scrub: 1,
           invalidateOnRefresh: true,
         },
       })
+
+      // Phase 1 (0-40%): fade down + shrink while passing through hero bottom
       moveTl.to(sphere, {
+        opacity: 0.3,
+        scale: 0.65,
         left: () => getTargetLeft(),
         top: '50%',
         ease: 'none',
+        duration: 0.4,
+      })
+      // Phase 2 (40-100%): fade back in at services position
+      moveTl.to(sphere, {
+        opacity: 0.85,
+        scale: 0.75,
+        ease: 'none',
+        duration: 0.6,
       })
 
-      // Timeline: fade out after services section ends
-      const fadeTl = gsap.timeline({
+      // Fade out after services end
+      gsap.to(sphere, {
         scrollTrigger: {
           trigger: servicesEl,
           start: 'bottom 80%',
           end: 'bottom 30%',
           scrub: 1,
         },
-      })
-      fadeTl.to(sphere, {
         opacity: 0,
-        scale: 0.7,
+        scale: 0.5,
         ease: 'none',
       })
     })
 
     mm.add('(max-width: 1023px)', () => {
-      // Mobile/Tablet: fade out when scrolling past hero
-      const fadeTl = gsap.timeline({
+      gsap.to(sphere, {
         scrollTrigger: {
           trigger: heroEl,
           start: 'bottom center',
           end: 'bottom top',
           scrub: 1,
         },
-      })
-      fadeTl.to(sphere, {
         opacity: 0,
-        scale: 0.8,
+        scale: 0.7,
         ease: 'none',
       })
     })
