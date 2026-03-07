@@ -33,14 +33,15 @@ export default function HomePage() {
     const mm = gsap.matchMedia()
 
     mm.add('(min-width: 1024px)', () => {
-      // Calculate the target left position (center of services left column)
+      // Calculate the target left position (center of services left column, shifted left to avoid overlap)
       const getTargetLeft = () => {
         const vw = window.innerWidth
         const maxW = Math.min(1400, vw)
         const containerLeft = (vw - maxW) / 2
         const padding = 48
         const gridWidth = maxW - padding * 2
-        return containerLeft + padding + (gridWidth * 4 / 12) / 2
+        const colCenter = containerLeft + padding + (gridWidth * 4 / 12) / 2
+        return colCenter - 60
       }
 
       // Timeline: move sphere from hero center → services left column
@@ -101,7 +102,7 @@ export default function HomePage() {
       {/* Single scroll-animated particle sphere */}
       <div
         ref={sphereRef}
-        className="fixed z-[2] pointer-events-none w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px]"
+        className="fixed z-[1] pointer-events-none w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px]"
         style={{ left: '50%', top: '50%' }}
       >
         <ParticleSphere />

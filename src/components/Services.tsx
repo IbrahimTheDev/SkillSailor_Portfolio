@@ -50,11 +50,12 @@ export default function Services() {
         end: () => `+=${window.innerHeight * 1.2}`,
         pin: true,
         pinSpacing: true,
-        scrub: 0.3,
+        scrub: 0.1,
         snap: {
           snapTo: 1 / (services.length - 1),
-          duration: { min: 0.2, max: 0.4 },
-          ease: 'power2.inOut',
+          duration: { min: 0.15, max: 0.3 },
+          delay: 0,
+          ease: 'power1.inOut',
         },
         onUpdate: (self) => {
           const idx = Math.min(
@@ -87,7 +88,7 @@ export default function Services() {
           <div className="hidden lg:block lg:col-span-4" />
 
           {/* Right - Services */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 relative z-[5]">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-10">
               <h2 className="text-4xl md:text-5xl font-normal text-white">
