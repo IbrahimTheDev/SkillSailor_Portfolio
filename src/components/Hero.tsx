@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { useRef } from 'react'
-import ParticleSphere from './ParticleSphere'
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null)
@@ -32,14 +31,7 @@ export default function Hero() {
         <div className="flex-1 flex items-center">
           <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
             <div className="relative">
-              {/* Particle Sphere - Centered */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px]">
-                  <ParticleSphere />
-                </div>
-              </div>
-
-              {/* Text content - overlaying sphere */}
+              {/* Text content */}
               <div className="relative z-10 py-24 sm:py-28 md:py-32 lg:py-40 text-center">
                 {/* Main headline */}
                 <motion.h1

@@ -1,6 +1,5 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
-import ParticleSphere from './ParticleSphere'
 
 const services = [
   {
@@ -41,18 +40,10 @@ export default function Services() {
   return (
     <section id="services" className="relative py-24 md:py-32 overflow-hidden bg-[#0a0a0a]">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+        <div ref={ref} className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
-          {/* Left - Particle Sphere */}
-          <motion.div
-            ref={ref}
-            initial={{ opacity: 0, x: -50 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1 }}
-            className="lg:col-span-4 relative h-[300px] sm:h-[400px] lg:h-[500px]"
-          >
-            <ParticleSphere />
-          </motion.div>
+          {/* Spacer for scroll-animated sphere */}
+          <div className="hidden lg:block lg:col-span-4" />
 
           {/* Right - Services */}
           <div className="lg:col-span-8">
